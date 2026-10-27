@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+  <section class="page-heading">
+    <p class="eyebrow"><a href="{{ url_for('users.list_users') }}">Manajemen User</a> / {{ page_title }}</p>
+    <h1>{{ page_title }}</h1>
+    <p class="muted">Isi informasi user di bawah ini.</p>
+  </section>
+
+  {% if error %}<div class="notice notice-error" role="alert">{{ error }}</div>{% endif %}
+
+  <form class="user-form" method="post" action="{{ url_for('users.edit_user', user_id=user.id) if user else url_for('users.create_user') }}">
+    <div class="form-field">
+      <label for="name">Nama lengkap</label>
+      <input id="name" name="name" maxlength="120" value="{{ form_data.get('name', '') }}" autocomplete="name" required>
+    </div>
+    <div class="form-field">
+      <label for="email">Alamat email</label>
+      <input id="email" name="email" type="email" maxlength="255" value="{{ form_data.get('email', '') }}" autocomplete="email" required>
+    </div>
+    <div class="form-field">
+      <label for="role">Peran</label>
+      <select id="role" name="role">
+        <option value="user" {% if form_data.get('role', 'user') == 'user' %}selected{% endif %}>User</option>
+        <option value="admin" {% if form_data.get('role') == 'admin' %}selected{% endif %}>Administrator</option>
+      </select>
+    </div>
+    <div class="form-actions">
+      <button class="button" type="submit">Simpan user</button>
+      <a class="button button-quiet" href="{{ url_for('users.list_users') }}">Batal</a>
+    </div>
+  </form>
+{% endblock %}

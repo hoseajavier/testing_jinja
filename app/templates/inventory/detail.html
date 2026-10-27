@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}{{ item.name }}{% endblock %}
+
+{% block content %}
+  <section class="page-heading">
+    <p>Inventory</p>
+    <h1>{{ item.name }}</h1>
+  </section>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}<div class="notice notice-{{ category }}">{{ message }}</div>{% endfor %}
+  {% endwith %}
+  {% if error %}<div class="notice notice-error" role="alert">{{ error }}</div>{% endif %}
+
+  <dl>
+    <dt>ID</dt>
+    <dd>{{ item.id }}</dd>
+    <dt>Status</dt>
+    <dd>{{ item.status }}</dd>
+    <dt>Created</dt>
+    <dd>{{ item.created_at }}</dd>
+  </dl>
+
+  <section class="related-users">
+    <h2>User pemilik</h2>
+    <p><strong>{{ item.user.name }}</strong> <span class="muted">{{ item.user.email }} (ID {{ item.user.id }})</span></p>
+    <form class="user-form" method="post" action="{{ url_for('inventory.update_inventory_users', item_id=item.id) }}">
+      <div class="form-field">
+        <label for="related-user-id">Pilih user pemilik</label>
+        <select id="related-user-id" name="user_id" required>
+          {% for user in users %}<option value="{{ user.id }}" {% if user.id == item.user.id %}selected{% endif %}>{{ user.name }} — {{ user.email }}</option>{% endfor %}
+        </select>
+      </div>
+      <button class="button" type="submit">Simpan user terkait</button>
+    </form>
+  </section>
+{% endblock %}

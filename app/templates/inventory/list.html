@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Inventory{% endblock %}
+
+{% block content %}
+  <section class="page-heading">
+    <p class="eyebrow">Operasional</p>
+    <h1>Inventory</h1>
+    <p class="muted">Lihat, cari, dan tambahkan item inventory.</p>
+  </section>
+
+  {% if error %}<div class="notice notice-error" role="alert">{{ error }}</div>{% endif %}
+
+  <form class="toolbar" method="get" action="{{ url_for('inventory.list_inventory') }}">
+    <label class="sr-only" for="inventory-search">Cari item</label>
+    <input id="inventory-search" name="q" value="{{ search }}" placeholder="Cari nama item">
+    <button class="button button-secondary" type="submit">Cari</button>
+    {% if search %}<a class="button button-quiet" href="{{ url_for('inventory.list_inventory') }}">Reset</a>{% endif %}
+  </form>
+
+  <form class="create-form" method="post" action="{{ url_for('inventory.create_inventory') }}">
+    <label class="sr-only" for="inventory-name">Nama item</label>
+    <input id="inventory-name" name="name" placeholder="Nama item baru" maxlength="255" value="{{ form_data.get('name', '') }}" required>
+    <label class="sr-only" for="inventory-status">Status</label>
+    <select id="inventory-status" name="status">
+      <option value="active" {% if form_data.get('status', 'active') == 'active' %}selected{% endif %}>Aktif</option>
+      <option value="inactive" {% if form_data.get('status') == 'inactive' %}selected{% endif %}>Nonaktif</option>
+    </select>
+    <label class="sr-only" for="inventory-user">Pemilik inventory</label>
+    <select id="inventory-user" name="user_id" required aria-label="Pilih user pemilik inventory">
+      <option value="">Pilih user</option>
+      {% for user in users %}<option value="{{ user.id }}" {% if user.id|string == form_data.get('user_id', '')|string %}selected{% endif %}>{{ user.name }}</option>{% endfor %}
+    </select>
+    <button class="button" type="submit">Tambah item</button>
+  </form>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>ID</th><th>Nama item</th><th>Status</th><th>User</th><th class="actions-heading">Detail</th></tr>
+      </thead>
+      <tbody>
+        {% for item in items %}
+          <tr>
+            <td>{{ item.id }}</td>
+            <td class="user-name">{{ item.name }}</td>
+            <td><span class="role-badge">{{ "Aktif" if item.status == "active" else "Nonaktif" }}</span></td>
+            <td>{{ item.user.name }}</td>
+            <td class="row-actions"><a href="{{ url_for('inventory.detail_inventory', item_id=item.id) }}">Lihat detail</a></td>
+          </tr>
+        {% else %}
+          <tr><td class="empty-state" colspan="5">{% if search %}Tidak ada item yang cocok dengan pencarian.{% else %}Belum ada item inventory. Tambahkan item pertama Anda.{% endif %}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <p class="result-count">{{ items|length }} item ditampilkan</p>
+{% endblock %}
